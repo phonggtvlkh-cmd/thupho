@@ -1,0 +1,15 @@
+---
+import { SITE_NAME } from '../consts';
+const today = new Date();
+---
+
+<footer class="footer">
+	<div class="wrap footer-in">
+		<span>&copy; {today.getFullYear()} {SITE_NAME}. Viết bằng tay, dựng bằng Astro.</span>
+		<nav aria-label="Liên kết cuối trang">
+			<a href="/about/">Giới thiệu</a>
+			<a href="/blog/">Tất cả bài viết</a>
+			<a href="/rss.xml">RSS</a>
+		</nav>
+	</div>
+</footer>

@@ -1,0 +1,75 @@
+---
+// Lưới bài viết, kèm hàng nút lọc theo chủ đề (chỉ hiện chủ đề đang có bài).
+import type { CollectionEntry } from 'astro:content';
+import { CATEGORIES, type CategoryKey } from '../consts';
+import { readMinutes } from '../utils/reading';
+import Cover from './Cover.astro';
+import FormattedDate from './FormattedDate.astro';
+
+interface Props {
+	posts: CollectionEntry<'blog'>[];
+	filter?: boolean;
+}
+const { posts, filter = true } = Astro.props;
+const used = (Object.keys(CATEGORIES) as CategoryKey[]).filter((k) =>
+	posts.some((p) => p.data.category === k),
+);
+---
+
+<div class="post-grid">
+	{
+		filter && used.length > 1 && (
+			<div class="chips reveal" role="group" aria-label="Lọc theo chủ đề">
+				<button class="chip" type="button" data-filter="all" aria-pressed="true">
+					Tất cả
+				</button>
+				{used.map((k) => (
+					<button class="chip" type="button" data-filter={k} aria-pressed="false">
+						{CATEGORIES[k]}
+					</button>
+				))}
+			</div>
+		)
+	}
+	<div class="grid">
+		{
+			posts.map((post) => (
+				<a class="card reveal" href={`/blog/${post.id}/`} data-cat={post.data.category}>
+					<div class="card-art">
+						<Cover category={post.data.category} />
+					</div>
+					<span class={`tag t-${post.data.category}`}>{CATEGORIES[post.data.category]}</span>
+					<h3>{post.data.title}</h3>
+					<p>{post.data.description}</p>
+					<div class="meta">
+						<span>
+							<FormattedDate date={post.data.pubDate} />
+						</span>
+						<span>{readMinutes(post.body)} phút đọc</span>
+					</div>
+				</a>
+			))
+		}
+	</div>
+	{posts.length === 0 && <p class="empty">Chưa có bài nào. Bạn quay lại sau nhé.</p>}
+</div>
+
+<script is:inline>
+	document.querySelectorAll('.post-grid').forEach(function (box) {
+		var chips = box.querySelectorAll('.chip');
+		var cards = box.querySelectorAll('.card');
+		chips.forEach(function (chip) {
+			chip.addEventListener('click', function () {
+				var f = chip.getAttribute('data-filter');
+				chips.forEach(function (c) {
+					c.setAttribute('aria-pressed', c === chip ? 'true' : 'false');
+				});
+				cards.forEach(function (card) {
+					var ok = f === 'all' || card.getAttribute('data-cat') === f;
+					card.hidden = !ok;
+					if (ok) card.classList.add('in');
+				});
+			});
+		});
+	});
+</script>

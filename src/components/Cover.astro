@@ -1,0 +1,56 @@
+---
+// Ảnh bìa phẳng vẽ bằng SVG, chọn theo chủ đề. Màu tự đổi theo giao diện sáng tối.
+import type { CategoryKey } from '../consts';
+
+interface Props {
+	category: CategoryKey;
+}
+const { category } = Astro.props;
+---
+
+<svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+	{
+		category === 'kd' && (
+			<g>
+				<rect width="320" height="200" class="f-accent" />
+				<circle cx="90" cy="100" r="46" class="f-bg" />
+				<circle cx="170" cy="100" r="34" class="f-yellow" />
+				<circle cx="235" cy="100" r="22" class="f-band" />
+			</g>
+		)
+	}
+	{
+		category === 'ai' && (
+			<g>
+				<rect width="320" height="200" class="f-yellow" />
+				<rect x="40" y="50" width="150" height="100" rx="16" class="f-band" />
+				<rect x="130" y="85" width="150" height="80" rx="16" class="f-bg" />
+				<circle cx="170" cy="125" r="7" class="f-accent" />
+				<circle cx="205" cy="125" r="7" class="f-accent" />
+				<circle cx="240" cy="125" r="7" class="f-accent" />
+			</g>
+		)
+	}
+	{
+		category === 'solo' && (
+			<g>
+				<rect width="320" height="200" class="f-blue" />
+				<rect x="0" y="140" width="320" height="60" class="f-band" />
+				<circle cx="160" cy="88" r="30" class="f-yellow" />
+				<rect x="130" y="118" width="60" height="60" rx="12" class="f-bg" />
+			</g>
+		)
+	}
+	{
+		category === 'note' && (
+			<g>
+				<rect width="320" height="200" class="f-pink" />
+				<rect x="85" y="35" width="150" height="150" rx="14" class="f-bg" />
+				<rect x="108" y="66" width="104" height="10" rx="5" class="f-band" />
+				<rect x="108" y="92" width="80" height="10" rx="5" class="f-band" opacity=".4" />
+				<rect x="108" y="118" width="94" height="10" rx="5" class="f-band" opacity=".4" />
+				<rect x="108" y="144" width="50" height="10" rx="5" class="f-accent" />
+			</g>
+		)
+	}
+</svg>

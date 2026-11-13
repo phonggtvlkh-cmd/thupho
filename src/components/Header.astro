@@ -1,0 +1,109 @@
+---
+import { SITE_NAME } from '../consts';
+
+const path = Astro.url.pathname;
+const links = [
+	{ href: '/', label: 'Trang chủ', active: path === '/', home: true },
+	{ href: '/blog/', label: 'Bài viết', active: path.startsWith('/blog'), home: false },
+	{ href: '/about/', label: 'Giới thiệu', active: path.startsWith('/about'), home: false },
+];
+---
+
+<a class="skip" href="#noi-dung">Bỏ qua, tới nội dung chính</a>
+<header class="header">
+	<div class="wrap header-in">
+		<a class="logo" href="/" aria-label={`${SITE_NAME}, về trang chủ`}>
+			<span class="logo-mark" aria-hidden="true"></span>{SITE_NAME}
+		</a>
+		<nav class="nav" aria-label="Điều hướng chính">
+			{
+				links.map((l) => (
+					<a href={l.href} class:list={[{ 'nav-home': l.home }]} aria-current={l.active ? 'page' : undefined}>
+						{l.label}
+					</a>
+				))
+			}
+		</nav>
+		<button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng tối">
+			<svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"></path></svg>
+			<svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.2 8.2 0 1 0 10.2 10.2z"></path></svg>
+			<span class="lbl" id="themeLbl">Sáng</span>
+			<span class="auto-dot" title="Đang tự đổi theo giờ của bạn"></span>
+		</button>
+	</div>
+</header>
+
+<script is:inline>
+	(function () {
+		var KEY = 'thupho-theme';
+		var root = document.documentElement;
+		var btn = document.getElementById('themeBtn');
+		var lbl = document.getElementById('themeLbl');
+		if (!btn || !lbl) return;
+
+		function autoTheme() {
+			var h = new Date().getHours(); // 6:00 đến 17:59 sáng, còn lại tối
+			return h >= 6 && h < 18 ? 'light' : 'dark';
+		}
+		function getSaved() {
+			try {
+				var v = localStorage.getItem(KEY);
+				return v === 'light' || v === 'dark' ? v : null;
+			} catch (e) {
+				return null;
+			}
+		}
+		function show(theme, manual) {
+			root.setAttribute('data-theme', theme);
+			root.setAttribute('data-theme-mode', manual ? 'manual' : 'auto');
+			lbl.textContent = theme === 'dark' ? 'Tối' : 'Sáng';
+			btn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+			btn.title = manual
+				? 'Bạn đang tự chọn giao diện. Bấm để đổi.'
+				: 'Đang tự đổi theo giờ của bạn. Bấm để đổi.';
+		}
+		function apply() {
+			var saved = getSaved();
+			show(saved || autoTheme(), !!saved);
+		}
+		btn.addEventListener('click', function () {
+			var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+			var manual = next !== autoTheme();
+			try {
+				// Chọn trùng với giờ hiện tại thì trả về tự động, khác thì nhớ lựa chọn tay.
+				if (manual) localStorage.setItem(KEY, next);
+				else localStorage.removeItem(KEY);
+			} catch (e) {}
+			show(next, manual);
+		});
+		apply();
+		// Đang mở trang mà qua 6:00 hoặc 18:00 thì tự đổi (chỉ khi đang ở chế độ tự động)
+		setInterval(function () {
+			if (root.getAttribute('data-theme-mode') === 'auto') show(autoTheme(), false);
+		}, 60000);
+		window.addEventListener('storage', apply); // đồng bộ giữa các tab
+
+		// Hiện dần khi cuộn tới
+		var items = document.querySelectorAll('.reveal');
+		if ('IntersectionObserver' in window) {
+			var io = new IntersectionObserver(
+				function (entries) {
+					entries.forEach(function (e) {
+						if (e.isIntersecting) {
+							e.target.classList.add('in');
+							io.unobserve(e.target);
+						}
+					});
+				},
+				{ rootMargin: '0px 0px -8% 0px' },
+			);
+			items.forEach(function (el) {
+				io.observe(el);
+			});
+		} else {
+			items.forEach(function (el) {
+				el.classList.add('in');
+			});
+		}
+	})();
+</script>

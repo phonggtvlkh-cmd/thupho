@@ -1,0 +1,105 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Cover from '../components/Cover.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import { SITE_TITLE, CATEGORIES, type CategoryKey } from '../consts';
+
+interface Props {
+	title: string;
+	description: string;
+	pubDate?: Date;
+	updatedDate?: Date;
+	heroImage?: string;
+	category?: CategoryKey;
+	minutes?: number;
+	// Trang tĩnh (như Giới thiệu) thì tắt ảnh bìa và nút quay lại
+	page?: boolean;
+}
+
+const {
+	title,
+	description,
+	pubDate,
+	updatedDate,
+	heroImage,
+	category = 'note',
+	minutes,
+	page = false,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="vi">
+	<head>
+		<BaseHead title={`${title} | ${SITE_TITLE}`} description={description} image={heroImage} />
+	</head>
+
+	<body>
+		{!page && <div class="progress" id="progress" aria-hidden="true" />}
+		<Header />
+		<main id="noi-dung">
+			<article class="post">
+				{
+					!page && (
+						<a class="back" href="/blog/">
+							← Tất cả bài viết
+						</a>
+					)
+				}
+				{!page && <span class={`tag t-${category}`}>{CATEGORIES[category]}</span>}
+				<h1 class="post-title">{title}</h1>
+				<p class="lead">{description}</p>
+				{
+					!page && pubDate && (
+						<div class="meta">
+							<span>
+								<FormattedDate date={pubDate} />
+							</span>
+							{minutes && <span>{minutes} phút đọc</span>}
+							{updatedDate && (
+								<span>
+									Cập nhật <FormattedDate date={updatedDate} />
+								</span>
+							)}
+						</div>
+					)
+				}
+				{
+					!page && (
+						<div class="post-cover">
+							{heroImage ? <img src={heroImage} alt="" /> : <Cover category={category} />}
+						</div>
+					)
+				}
+				<div class="prose" style={page ? 'margin-top:32px' : 'margin-top:32px'}>
+					<slot />
+				</div>
+				{
+					!page && (
+						<div class="post-end">
+							Cảm ơn bạn đã đọc tới đây. <a class="back" href="/blog/" style="margin:0 0 0 6px">Đọc bài khác →</a>
+						</div>
+					)
+				}
+			</article>
+		</main>
+		<Footer />
+
+		<script is:inline>
+			// Thanh tiến độ đọc ở mép trên
+			(function () {
+				var bar = document.getElementById('progress');
+				if (!bar) return;
+				function update() {
+					var max = document.documentElement.scrollHeight - window.innerHeight;
+					bar.style.width = (max > 0 ? Math.min(100, (window.scrollY / max) * 100) : 0) + '%';
+				}
+				window.addEventListener('scroll', update, { passive: true });
+				window.addEventListener('resize', update);
+				update();
+			})();
+		</script>
+	</body>
+</html>

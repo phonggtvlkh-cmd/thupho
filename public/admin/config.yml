@@ -1,0 +1,85 @@
+locale: vi
+site_url: https://thupho.thupho.workers.dev
+display_url: https://thupho.thupho.workers.dev
+logo_url: /favicon.svg
+
+# Khi repo GitHub đã được tạo, Decap dùng repo này để lưu bài viết và ảnh.
+backend:
+  name: github
+  repo: phonggtvlkh-cmd/thupho
+  branch: main
+  open_authoring: true
+  squash_merges: true
+
+# Mỗi bản nháp tạo một nhánh và pull request để quản trị viên duyệt trước khi đăng.
+publish_mode: editorial_workflow
+
+media_folder: public/uploads
+public_folder: /uploads
+
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: "-"
+
+collections:
+  - name: blog
+    label: Bài viết
+    label_singular: Bài viết
+    folder: src/content/blog
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    summary: "{{title}} - {{pubDate}}"
+    sortable_fields: [pubDate, title, category]
+    view_filters:
+      - label: Kinh doanh
+        field: category
+        pattern: kd
+      - label: Dùng AI
+        field: category
+        pattern: ai
+      - label: Làm một mình
+        field: category
+        pattern: solo
+      - label: Ghi chép
+        field: category
+        pattern: note
+    fields:
+      - label: Tiêu đề
+        name: title
+        widget: string
+      - label: Mô tả ngắn
+        name: description
+        widget: text
+        hint: Nội dung này xuất hiện ở trang danh sách và kết quả tìm kiếm.
+      - label: Ngày đăng
+        name: pubDate
+        widget: datetime
+        date_format: YYYY-MM-DD
+        time_format: false
+        format: YYYY-MM-DD
+      - label: Ngày cập nhật
+        name: updatedDate
+        widget: datetime
+        date_format: YYYY-MM-DD
+        time_format: false
+        format: YYYY-MM-DD
+        required: false
+      - label: Chủ đề
+        name: category
+        widget: select
+        default: note
+        options:
+          - { label: Kinh doanh, value: kd }
+          - { label: Dùng AI, value: ai }
+          - { label: Làm một mình, value: solo }
+          - { label: Ghi chép, value: note }
+      - label: Ảnh đại diện
+        name: heroImage
+        widget: image
+        required: false
+      - label: Nội dung
+        name: body
+        widget: markdown

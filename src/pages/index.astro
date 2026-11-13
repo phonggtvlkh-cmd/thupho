@@ -1,0 +1,159 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Cover from '../components/Cover.astro';
+import PostGrid from '../components/PostGrid.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import { SITE_TITLE, SITE_DESCRIPTION, CATEGORIES } from '../consts';
+import { readMinutes } from '../utils/reading';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const featured = posts[0]; // bài mới nhất lên vị trí nổi bật
+const rest = posts.slice(1, 7); // sáu bài kế tiếp
+---
+
+<!doctype html>
+<html lang="vi">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		<main id="noi-dung">
+			<section class="hero">
+				<div class="wrap hero-grid">
+					<div>
+						<span class="hello">
+							<span id="helloIcon" aria-hidden="true">☀️</span>
+							<b id="helloText">Chào bạn</b>
+							<span id="helloTime"></span>
+						</span>
+						<h1>Ghi chép thật về <em>kinh doanh</em>, AI và làm việc một mình.</h1>
+						<p class="lead">
+							Viết từ việc mình đang làm thật. Ngắn, có ví dụ cụ thể, đọc xong là áp dụng được.
+						</p>
+						<div class="cta-row">
+							<a class="btn btn-primary" href={featured ? `/blog/${featured.id}/` : '/blog/'}>
+								Đọc bài mới nhất
+							</a>
+							<a class="btn btn-ghost" href="/about/">Mình là ai?</a>
+						</div>
+					</div>
+					<div class="hero-art" aria-hidden="true">
+						<svg viewBox="0 0 500 400" preserveAspectRatio="xMidYMid slice">
+							<rect width="500" height="400" class="f-s2"></rect>
+							<circle class="float-a f-yellow" cx="380" cy="110" r="70"></circle>
+							<rect x="70" y="150" width="230" height="170" rx="18" class="f-accent"></rect>
+							<rect x="100" y="185" width="120" height="14" rx="7" class="f-bg"></rect>
+							<rect x="100" y="215" width="170" height="10" rx="5" class="f-bg" opacity=".6"></rect>
+							<rect x="100" y="237" width="150" height="10" rx="5" class="f-bg" opacity=".6"></rect>
+							<rect x="100" y="259" width="90" height="10" rx="5" class="f-bg" opacity=".6"></rect>
+							<g class="float-b">
+								<rect x="260" y="220" width="170" height="120" rx="18" class="f-teal"></rect>
+								<path
+									d="M285 310 L320 275 L350 295 L405 245"
+									class="s-bg"
+									stroke-width="9"
+									stroke-linecap="round"
+									stroke-linejoin="round"></path>
+							</g>
+							<rect x="52" y="70" width="64" height="64" rx="16" class="f-blue"></rect>
+							<circle cx="200" cy="90" r="16" class="f-pink"></circle>
+						</svg>
+					</div>
+				</div>
+			</section>
+
+			{
+				featured && (
+					<section class="section" style="padding-top:8px">
+						<div class="wrap reveal">
+							<a class="feature" href={`/blog/${featured.id}/`}>
+								<div class="feature-art">
+									<Cover category={featured.data.category} />
+								</div>
+								<div class="feature-body">
+									<span class="kicker">Bài mới nhất</span>
+									<span class={`tag t-${featured.data.category}`}>
+										{CATEGORIES[featured.data.category]}
+									</span>
+									<h3>{featured.data.title}</h3>
+									<p>{featured.data.description}</p>
+									<div class="meta">
+										<span>
+											<FormattedDate date={featured.data.pubDate} />
+										</span>
+										<span>{readMinutes(featured.body)} phút đọc</span>
+									</div>
+								</div>
+							</a>
+						</div>
+					</section>
+				)
+			}
+
+			{
+				rest.length > 0 && (
+					<section class="section" id="bai-moi">
+						<div class="wrap">
+							<div class="sec-head reveal">
+								<div>
+									<span class="kicker">Mới cập nhật</span>
+									<h2>Bài viết gần đây</h2>
+								</div>
+								<a class="more" href="/blog/">
+									Xem tất cả bài →
+								</a>
+							</div>
+							<PostGrid posts={rest} />
+						</div>
+					</section>
+				)
+			}
+
+			<section class="section">
+				<div class="wrap">
+					<div class="band reveal">
+						<span class="dot1" aria-hidden="true"></span>
+						<span class="dot2" aria-hidden="true"></span>
+						<div class="band-in">
+							<h2>Muốn đọc bài mới ngay khi vừa đăng?</h2>
+							<p>Thêm địa chỉ RSS của blog vào ứng dụng đọc tin bạn đang dùng. Không cần đăng ký, không cần email.</p>
+							<div class="cta-row">
+								<a class="btn btn-primary" href="/rss.xml">Lấy địa chỉ RSS</a>
+								<a class="btn btn-ghost" href="/blog/">Xem tất cả bài</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+		<Footer />
+
+		<script is:inline>
+			// Lời chào theo giờ trên máy người xem
+			(function () {
+				var d = new Date(),
+					h = d.getHours();
+				var text =
+					h < 5
+						? 'Khuya rồi, chào bạn'
+						: h < 11
+							? 'Chào buổi sáng'
+							: h < 13
+								? 'Chào buổi trưa'
+								: h < 18
+									? 'Chào buổi chiều'
+									: 'Chào buổi tối';
+				document.getElementById('helloText').textContent = text;
+				document.getElementById('helloIcon').textContent = h >= 6 && h < 18 ? '☀️' : '🌙';
+				document.getElementById('helloTime').textContent =
+					'· ' + d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+			})();
+		</script>
+	</body>
+</html>

@@ -1,0 +1,35 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PostGrid from '../../components/PostGrid.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<!doctype html>
+<html lang="vi">
+	<head>
+		<BaseHead title={`Bài viết | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		<main id="noi-dung">
+			<div class="wrap page-head">
+				<span class="kicker">{posts.length} bài</span>
+				<h1>Tất cả bài viết</h1>
+				<p class="lead">Bấm vào một chủ đề để lọc. Bài mới nhất nằm trên cùng.</p>
+			</div>
+			<section class="section" style="padding-top:32px">
+				<div class="wrap">
+					<PostGrid posts={posts} />
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
