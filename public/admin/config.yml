@@ -8,6 +8,8 @@ backend:
   name: github
   repo: phonggtvlkh-cmd/thupho
   branch: main
+  base_url: https://thupho-cms-auth.thupho.workers.dev
+  auth_endpoint: /auth
   open_authoring: true
   squash_merges: true
 

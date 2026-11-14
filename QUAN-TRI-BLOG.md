@@ -14,7 +14,7 @@ Trang quản trị được đặt tại `/admin/` và dùng Decap CMS. Bài vi�
 
 1. Repo GitHub `phonggtvlkh-cmd/thupho` chứa mã nguồn trên nhánh `main`.
 2. Kết nối repo với Cloudflare Workers để tự triển khai khi `main` thay đổi.
-3. Cấu hình dịch vụ OAuth cho Decap GitHub backend. OAuth cần GitHub OAuth App và một callback/proxy; không lưu Client Secret trong repo.
+3. OAuth đăng nhập qua Worker `https://thupho-cms-auth.thupho.workers.dev`; Client ID và Client Secret được lưu dưới dạng Cloudflare secrets, không nằm trong repo.
 4. Nếu URL thật khác `https://thupho.thupho.workers.dev`, sửa `site_url` và `display_url` trong `public/admin/config.yml`.
 
 ## Phân quyền
